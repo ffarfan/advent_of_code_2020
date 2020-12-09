@@ -139,6 +139,8 @@ Your puzzle answer was 194.
 
 import re
 
+import advent_utils
+
 
 def puzzle_1(passports):
     valid_passport_count = 0
@@ -162,20 +164,18 @@ def puzzle_2(passports):
     print(valid_passport_count)
 
 
-def load_passports_from_file(input_filename):
+def load_passports_from_data(passport_data):
     passports = []
-    with open(input_filename, 'r') as f_input:
-        passport_data = [line.strip() for line in f_input.readlines()]
 
-        current_passport_data = []
-        for line in passport_data:
-            if line:
-                current_passport_data.extend(line.split(' '))
-            elif not line and current_passport_data:
-                passports.append(load_passport_from_data(current_passport_data))
-                current_passport_data = []
+    current_passport_data = []
+    for line in passport_data:
+        if line:
+            current_passport_data.extend(line.split(' '))
+        elif not line and current_passport_data:
+            passports.append(load_passport_from_data(current_passport_data))
+            current_passport_data = []
 
-        passports.append(load_passport_from_data(current_passport_data))
+    passports.append(load_passport_from_data(current_passport_data))
 
     return passports
 
@@ -403,9 +403,11 @@ def _test_passports():
 
 
 if __name__ == '__main__':
-    # _test_validations()
-    passports = load_passports_from_file('inputs/input_04.txt')
-    # passports = load_passports_from_file('inputs/test_04_2.txt')
+    input_data = advent_utils.load_input_from_file('inputs/input_04.txt')
+    # input_data = advent_utils.load_input_from_file('inputs/test_04.txt')
 
-    # puzzle_1(passports)
+    # _test_validations()
+    passports = load_passports_from_data(input_data)
+
+    puzzle_1(passports)
     puzzle_2(passports)

@@ -78,6 +78,8 @@ Your puzzle answer was 158730.
 
 """
 
+import advent_utils
+
 TARGET_BAG = 'shiny gold'
 
 
@@ -128,12 +130,12 @@ def count_inner_bags(bag_rules, bag_color, count):
     return level_count * count + count
 
 
-def load_bag_rules_from_file(input_filename):
+def load_bag_rules_from_data(input_data):
     bag_rules = {}
-    with open(input_filename, 'r') as f_input:
-        for line in f_input.readlines():
-            k, v = load_bag_rule_from_data(line.strip())
-            bag_rules[k] = v
+
+    for line in input_data:
+        k, v = load_bag_rule_from_data(line.strip())
+        bag_rules[k] = v
 
     return bag_rules
 
@@ -169,8 +171,10 @@ def load_bag_rule_from_data(bag_rule_data):
 
 
 if __name__ == '__main__':
-    bag_rules = load_bag_rules_from_file('inputs/input_07.txt')
-    # bag_rules = load_bag_rules_from_file('inputs/test_07.txt')
+    input_data = advent_utils.load_input_from_file('inputs/input_07.txt')
+    # input_data = advent_utils.load_input_from_file('inputs/test_07.txt')
+
+    bag_rules = load_bag_rules_from_data(input_data)
 
     print('puzzle_1: {s}'.format(s=puzzle_1(bag_rules)))
     print('puzzle_2: {s}'.format(s=puzzle_2(bag_rules)))
