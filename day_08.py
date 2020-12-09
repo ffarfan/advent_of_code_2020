@@ -113,6 +113,8 @@ Your puzzle answer was 1033.
 
 import copy
 
+import advent_utils
+
 
 def puzzle_1(code):
     states_seen = {}
@@ -166,15 +168,6 @@ def puzzle_2(code):
     raise ValueError('No valid program found')
 
 
-def load_input_from_file(input_filename):
-    input_data = []
-    with open(input_filename, 'r') as f_input:
-        for line in f_input:
-            input_data.append(line.strip())
-
-    return input_data
-
-
 def parse_line(line):
     line_of_code = line.split(' ')
     instruction = line_of_code[0]
@@ -203,8 +196,8 @@ def debug_state(code, states_seen):
 
 
 if __name__ == '__main__':
-    input_data = load_input_from_file('inputs/input_08.txt')
-    # input_data = load_input_from_file('inputs/test_08.txt')
+    input_data = advent_utils.load_input_from_file('inputs/input_08.txt')
+    # input_data = advent_utils.load_input_from_file('inputs/test_08.txt')
 
     _, acc = puzzle_1(input_data)
     print('puzzle_1: {s}'.format(s=acc))

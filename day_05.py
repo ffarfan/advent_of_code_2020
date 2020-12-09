@@ -69,6 +69,8 @@ What is the ID of your seat?
 Your puzzle answer was 524.
 """
 
+import advent_utils
+
 AIRPLANE_ROWS = 128
 AIRPLANE_COLS = 8
 
@@ -100,11 +102,8 @@ def puzzle_2(boarding_passes):
             return expected_seat_id
 
 
-def load_boarding_passes_from_file(input_filename):
-    boarding_passes = []
-    with open(input_filename, 'r') as f_input:
-        for line in f_input:
-            boarding_passes.append(load_boarding_pass_from_data(line.strip()))
+def load_boarding_passes_from_data(input_data):
+    boarding_passes = [load_boarding_pass_from_data(line) for line in input_data]
 
     return boarding_passes
 
@@ -138,7 +137,8 @@ def get_position(seat_data, seat_data_idx, start, stop, left_bound, right_bound)
 
 
 if __name__ == '__main__':
-    boarding_passes = load_boarding_passes_from_file('inputs/input_05.txt')
+    input_data = advent_utils.load_input_from_file('inputs/input_05.txt')
+    boarding_passes = load_boarding_passes_from_data(input_data)
 
     print('puzzle_1: {s}'.format(s=puzzle_1(boarding_passes)))
     print('puzzle_2: {s}'.format(s=puzzle_2(boarding_passes)))

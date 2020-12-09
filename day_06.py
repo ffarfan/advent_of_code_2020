@@ -93,9 +93,11 @@ For each group, count the number of questions to which everyone answered "yes". 
 Your puzzle answer was 3193.
 """
 
+import advent_utils
 
-def puzzle_1(input_filename):
-    answers = load_answers_from_file(input_filename, load_answers_for_puzzle_1)
+
+def puzzle_1(input_data):
+    answers = load_answers_from_data(input_data, load_answers_for_puzzle_1)
 
     answer_count = 0
     for answer in answers:
@@ -104,8 +106,8 @@ def puzzle_1(input_filename):
     return answer_count
 
 
-def puzzle_2(input_filename):
-    answers = load_answers_from_file(input_filename, load_answers_for_puzzle_2)
+def puzzle_2(input_data):
+    answers = load_answers_from_data(input_data, load_answers_for_puzzle_2)
 
     valid_answer_count = 0
     for answer_group in answers:
@@ -116,20 +118,18 @@ def puzzle_2(input_filename):
     return valid_answer_count
 
 
-def load_answers_from_file(input_filename, callback):
+def load_answers_from_data(input_data, callback):
     answers = []
-    with open(input_filename, 'r') as f_input:
-        answer_data = [line.strip() for line in f_input.readlines()]
 
-        current_answer_data = []
-        for line in answer_data:
-            if line:
-                current_answer_data.extend(line.split(' '))
-            elif not line and current_answer_data:
-                answers.append(callback(current_answer_data))
-                current_answer_data = []
+    current_answer_data = []
+    for line in input_data:
+        if line:
+            current_answer_data.extend(line.split(' '))
+        elif not line and current_answer_data:
+            answers.append(callback(current_answer_data))
+            current_answer_data = []
 
-        answers.append(callback(current_answer_data))
+    answers.append(callback(current_answer_data))
 
     return answers
 
@@ -159,7 +159,7 @@ def load_answers_for_puzzle_2(answer_data):
 
 
 if __name__ == '__main__':
-    input_filename = 'inputs/input_06.txt'
+    input_data = advent_utils.load_input_from_file('inputs/input_06.txt')
 
-    print('puzzle_1: {s}'.format(s=puzzle_1(input_filename)))
-    print('puzzle_2: {s}'.format(s=puzzle_2(input_filename)))
+    print('puzzle_1: {s}'.format(s=puzzle_1(input_data)))
+    print('puzzle_2: {s}'.format(s=puzzle_2(input_data)))

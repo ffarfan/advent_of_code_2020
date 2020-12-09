@@ -50,6 +50,8 @@ In your expense report, what is the product of the three entries that sum to 202
 Your puzzle answer was 111605670.
 """
 
+import advent_utils
+
 
 def puzzle_1(input_numbers):
     answers = set()
@@ -73,9 +75,8 @@ def puzzle_2(input_numbers):
 
 
 if __name__ == '__main__':
-    input_numbers = []
-    with open('inputs/input_01.txt', 'r') as f_input:
-        input_numbers = sorted([int(line.strip()) for line in f_input.readlines()])
+    input_data = advent_utils.load_input_from_file('inputs/input_01.txt')
+    input_numbers = sorted([int(line) for line in input_data])
 
     puzzle_1(input_numbers)
     puzzle_2(input_numbers)

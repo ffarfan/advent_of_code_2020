@@ -56,6 +56,8 @@ How many passwords are valid according to the new interpretation of the policies
 Your puzzle answer was 649.
 """
 
+import advent_utils
+
 
 def puzzle_1(input_rules):
     valid_rules = 0
@@ -109,9 +111,8 @@ def is_p2_password_valid(input_rule):
 
 
 if __name__ == '__main__':
-    input_rules = []
-    with open('inputs/input_02.txt', 'r') as f_input:
-        input_rules = [get_password_rule(line.strip()) for line in f_input.readlines()]
+    input_data = advent_utils.load_input_from_file('inputs/input_02.txt')
+    input_rules = [get_password_rule(line) for line in input_data]
 
     puzzle_1(input_rules)
     puzzle_2(input_rules)

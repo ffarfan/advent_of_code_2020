@@ -88,6 +88,8 @@ What do you get if you multiply together the number of trees encountered on each
 Your puzzle answer was 3064612320.
 """
 
+import advent_utils
+
 TREE = '#'
 
 
@@ -134,10 +136,8 @@ def move_down(curr_y, down_increment):
 
 
 if __name__ == '__main__':
-    the_map = []
-    # with open('test_03.txt', 'r') as f_input:
-    with open('inputs/input_03.txt', 'r') as f_input:
-        the_map = [line.strip() for line in f_input.readlines()]
+    the_map = advent_utils.load_input_from_file('inputs/input_03.txt')
+    # the_map = advent_utils.load_input_from_file('inputs/test_03.txt')
 
     print(puzzle_1(the_map, right_increment=3, down_increment=1))
 
