@@ -88,137 +88,108 @@ the third position must be seat; you can conclude that in your ticket, class is 
 Once you work out which field is which, look for the six fields on your ticket that start with the word departure. What
 do you get if you multiply those six values together?
 
+Your puzzle answer was 1346570764607.
+
 """
 
 import collections
 import re
 
 
-def puzzle_1(ticket_data):
+def puzzle_1(ticket_notes, nearby_tickets):
     ticket_error_rate = 0
-    for ticket in ticket_data['nearby_tickets']:
-        ticket_error_rate += scan_ticket(ticket_data, ticket)
+
+    for ticket in nearby_tickets:
+        ticket_error_rate += scan_ticket(ticket_notes, ticket)
 
     return ticket_error_rate
 
 
-def puzzle_2(ticket_data):
-    valid_tickets = []
-    my_ticket = ticket_data['my_ticket']
+def puzzle_2(ticket_notes, my_ticket, nearby_tickets):
+    valid_tickets = [my_ticket]
 
-    for ticket in ticket_data['nearby_tickets']:
-        if scan_ticket(ticket_data, ticket) == 0:
-            valid_tickets.append(ticket)
+    for ticket in nearby_tickets:
+        if scan_ticket(ticket_notes, ticket) == 0:
+            valid_tickets.append([int(ln) for ln in ticket.split(',')])
 
-    note_order = {}
-    for i in range(len(ticket_data['ticket_notes'])):
-        note_order[i] = set()
+    over_under = collections.defaultdict(list)
+    num_fields = len(valid_tickets[0])
+    for field in range(num_fields):
+        over_under[field] = [ticket[field] for ticket in valid_tickets]
 
-    for ticket in valid_tickets:
-        for i, ticket_value in enumerate(ticket):
-            notes = set()
-            for note in ticket_data['ticket_notes']:
-                for note_value in ticket_data['ticket_notes'][note]:
-                    if is_value_in_range(ticket_value, note_value):
-                        notes.add(note)
-            if len(note_order[i]) == 0:
-                note_order[i] = notes
-            else:
-                note_order[i] = note_order[i].intersection(notes)
+    memory = {}
+    assign = {}
+    assign_back = {}
+    while len(ticket_notes) > len(assign):
+        for field_idx in range(num_fields):
+            if field_idx in assign_back.keys():
+                continue
+            ticket = []
+            for field_name in ticket_notes.keys():
+                if field_name in assign.keys():
+                    continue
+                if can_match(ticket_notes, over_under, memory, field_name, field_idx):
+                    ticket.append(field_name)
+            if len(ticket) == 1:
+                assign[ticket[0]] = field_idx
+                assign_back[field_idx] = ticket[0]
 
-    for note in ticket_data['ticket_notes']:
-        note_ = []
-        for ni in note_order:
-            if note in note_order[ni]:
-                note_.append(ni)
+    product = 1
+    for field_name, field_idx in assign.items():
+        if field_name.startswith('departure'):
+            print(field_name, my_ticket[field_idx])
+            product *= my_ticket[field_idx]
 
-        print(note, note_)
-
-    print(note_order)
-    departure_value = 1
-
-    for ticket_note in ticket_data['ticket_notes']:
-        if ticket_note.startswith('departure'):
-            departure_value *= my_ticket[note_order[ticket_note]]
-
-    return departure_value
+    return product
 
 
-def scan_ticket(ticket_data, ticket):
-    for ticket_value in ticket:
-        value_found = False
-        for note in ticket_data['ticket_notes']:
-            for note_value in ticket_data['ticket_notes'][note]:
-                if is_value_in_range(ticket_value, note_value):
-                    value_found = True
-                    break
+def scan_ticket(ticket_notes, ticket):
+    ticket_error_rate = 0
+    all_ticket_ranges = []
+    for ticket_note in ticket_notes:
+        all_ticket_ranges.extend(ticket_notes[ticket_note])
 
-        if not value_found:
-            return ticket_value
+    nums = [int(ln) for ln in ticket.split(',')]
+    for num in nums:
+        if any(a <= num <= b for a, b in all_ticket_ranges):
+            pass
+        else:
+            ticket_error_rate += num
 
-    return 0
-
-
-def parse_tickets_from_data(input_data):
-    ticket_data = {
-        'ticket_notes': {},
-        'my_ticket': [],
-        'nearby_tickets': []
-    }
-
-    reading_properties = True
-    reading_ticket = False
-    reading_nearby_tickets = False
-    for line in input_data:
-        if reading_properties:
-            if line == '':
-                reading_properties = False
-                reading_ticket = True
-            else:
-                props = line.split(':')
-                ticket_data['ticket_notes'][props[0]] = props[1].split(' or ')
-        elif reading_ticket:
-            if line == 'your ticket:':
-                pass
-            elif line == '':
-                reading_ticket = False
-                reading_nearby_tickets = True
-            else:
-                ticket_data['my_ticket'] = [int(v) for v in line.split(',')]
-        elif reading_nearby_tickets:
-            if line == 'nearby tickets:' or line == '':
-                pass
-            else:
-                ticket_data['nearby_tickets'].append([int(v) for v in line.split(',')])
-
-    return ticket_data
+    return ticket_error_rate
 
 
-def is_value_in_range(the_value, the_range):
-    min_val, max_val = [int(v) for v in the_range.split('-')]
-    return min_val <= the_value <= max_val
+def can_match(ticket_notes, over_under, memory, field_name, field_idx):
+    k = (field_name, field_idx)
+    if k in memory:
+        return memory[k]
+    match = all(any(a <= v <= b for a, b in ticket_notes[field_name]) for v in over_under[field_idx])
+    memory[k] = match
+
+    return match
 
 
 def parse_data(filename):
     ranges, my_ticket, nearby_tickets = [line.rstrip('\n') for line in open(filename).read().split('\n\n')]
 
-    note_ranges = []
     ticket_notes = collections.defaultdict(list)
     for line in ranges.splitlines():
         note = line.split(': ')[0]
         for a, b in re.findall(r'(\d+)-(\d+)', line):
-            note_ranges.append((int(a), int(b), note))
             ticket_notes[note].append((int(a), int(b)))
+
+    my_ticket = [int(num) for num in my_ticket.splitlines()[1].split(',')]
+    nearby_tickets = nearby_tickets.splitlines()[1:]
 
     return ticket_notes, my_ticket, nearby_tickets
 
 
 if __name__ == '__main__':
-    # filename = 'inputs/input_16.txt'
+    filename = 'inputs/input_16.txt'
     # filename = 'inputs/test_16_1.txt'
-    filename = 'inputs/test_16_2.txt'
+    # filename = 'inputs/test_16_2.txt'
 
     ticket_notes, my_ticket, nearby_tickets = parse_data(filename)
 
-    print('puzzle_1: {s}'.format(s=puzzle_1(ticket_data)))
-    # print('puzzle_2: {s}'.format(s=puzzle_2(ticket_data)))
+    print('puzzle_1: {s}'.format(s=puzzle_1(ticket_notes, nearby_tickets)))
+    print('puzzle_2: {s}'.format(s=puzzle_2(ticket_notes, my_ticket, nearby_tickets)))
